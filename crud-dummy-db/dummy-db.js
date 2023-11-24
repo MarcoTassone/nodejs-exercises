@@ -3,20 +3,16 @@
   app.use(express.json());
   const Joi = require("joi");
   
-  let planets = Joi.object([
+  let planets = [
     {
-      id: Joi.number() ,
-      name: Joi.string(),
+      id: 1 ,
+      name: "Earth",
     },
     {
       id: 2,
       name: "Mars",
     },
-  ]).with("id", "name");
-  
- planets.validate({ id: 1, name: "Mars"})
-
- // riguardo la libreria joi sono incerto. ho visto la documentazione ma non ho ben capito come funzoina
+  ]
   
   app.get("/api/planets", (req, res) => {
       res.status(200).json(planets);
@@ -34,15 +30,22 @@
     console.log(id)
   })
 
+  let planetSchema = Joi.object ({
+    id: Joi.number().integer().required(),
+    name: Joi.string().required()
+  })
+
   app.post("/api/planets", (req, res) => {
     const newPlanet = req.body;
+    const validatePlanet = planetSchema.validate(newPlanet);
 
-    if (Object.keys(newPlanet).length != 0) {
+    if (validatePlanet.error) {
+        return res.status(400).send(validatePlanet.error)
+    } else if (Object.keys(newPlanet).length != 0) {
         planets.push(newPlanet);
         res.status(201).send("planet created")
         return
     }
-
   })
 
   app.put("/api/planets/:id", (req, res) => {
