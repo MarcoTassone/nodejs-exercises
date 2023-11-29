@@ -1,7 +1,7 @@
 import express from "express";
 const app = express();
 app.use(express.json());
-import { getAll, getOneById, create, updateById, deleteById } from "./controllers/planets";
+import { getAll, getOneById, create, updateById, deleteById } from "./controllers/planets.js";
 
 app.get("/api/planets", getAll)
 
