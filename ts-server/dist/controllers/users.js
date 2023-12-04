@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import * as dotenv from 'dotenv';
+import * as dotenv from "dotenv";
 dotenv.config();
 import { db } from "../db.js";
 import jwt from "jsonwebtoken";
@@ -32,11 +32,16 @@ const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, password } = req.body;
     const user = yield db.oneOrNone(`SELECT * FROM users WHERE username=$1`, username);
     if (user) {
-        res.status(400).json({ msg: "user already exists" });
+        res.status(409).json({ msg: "user already exists" });
     }
     else {
         const { id } = yield db.one(`INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id`, [username, password]);
         res.status(201).json({ id, msg: "Signup successful. Now you can log in." });
     }
 });
-export { login, signup };
+const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    yield db.none(`UPDATE users SET token=$2 WHERE id=$1`, [user === null || user === void 0 ? void 0 : user.id, null]);
+    res.status(200).json({ msg: "logout successful" });
+});
+export { login, signup, logout };
